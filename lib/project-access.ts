@@ -1,4 +1,4 @@
-import { auth, currentUser } from "@clerk/nextjs/server"
+import { createClient } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
 
 export interface ProjectIdentity {
@@ -7,21 +7,18 @@ export interface ProjectIdentity {
 }
 
 export async function getCurrentProjectIdentity(): Promise<ProjectIdentity> {
-  const { userId } = await auth()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!userId) {
-    return {
-      userId: null,
-      primaryEmailAddress: null,
-    }
+  if (!user) {
+    return { userId: null, primaryEmailAddress: null }
   }
 
-  const user = await currentUser()
-
   return {
-    userId,
-    primaryEmailAddress:
-      user?.primaryEmailAddress?.emailAddress?.trim().toLowerCase() ?? null,
+    userId: user.id,
+    primaryEmailAddress: user.email?.trim().toLowerCase() ?? null,
   }
 }
 

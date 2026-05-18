@@ -1,11 +1,12 @@
-import { auth } from "@clerk/nextjs/server"
+import { createClient } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
 import { tasks } from "@trigger.dev/sdk/v3"
 import type { designAgent } from "@/trigger/design-agent"
 
 export async function POST(request: Request) {
-  const { userId } = await auth()
-  if (!userId) return Response.json({ error: "Unauthorized" }, { status: 401 })
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
   const body: unknown = await request.json().catch(() => ({}))
   const b = typeof body === "object" && body !== null ? (body as Record<string, unknown>) : {}
@@ -17,10 +18,10 @@ export async function POST(request: Request) {
     return Response.json({ error: "Missing required fields" }, { status: 400 })
   }
 
-  const handle = await tasks.trigger<typeof designAgent>("design-agent", { prompt, roomId, userId })
+  const handle = await tasks.trigger<typeof designAgent>("design-agent", { prompt, roomId, userId: user.id })
 
   await prisma.taskRun.create({
-    data: { runId: handle.id, projectId, userId },
+    data: { runId: handle.id, projectId, userId: user.id },
   })
 
   return Response.json({ runId: handle.id }, { status: 201 })

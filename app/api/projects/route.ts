@@ -1,12 +1,13 @@
-import { auth } from "@clerk/nextjs/server"
+import { createClient } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
 
 export async function GET() {
-  const { userId } = await auth()
-  if (!userId) return Response.json({ error: "Unauthorized" }, { status: 401 })
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
   const projects = await prisma.project.findMany({
-    where: { ownerId: userId },
+    where: { ownerId: user.id },
     orderBy: { createdAt: "desc" },
   })
 
@@ -14,8 +15,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { userId } = await auth()
-  if (!userId) return Response.json({ error: "Unauthorized" }, { status: 401 })
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 })
 
   const body: unknown = await request.json().catch(() => ({}))
   const b = typeof body === "object" && body !== null ? (body as Record<string, unknown>) : {}
@@ -23,7 +25,7 @@ export async function POST(request: Request) {
   const id = typeof b.id === "string" && b.id.trim() ? b.id.trim() : undefined
 
   const project = await prisma.project.create({
-    data: { ...(id ? { id } : {}), ownerId: userId, name },
+    data: { ...(id ? { id } : {}), ownerId: user.id, name },
   })
 
   return Response.json({ project }, { status: 201 })

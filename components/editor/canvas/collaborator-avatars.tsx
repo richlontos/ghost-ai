@@ -2,12 +2,13 @@
 
 import Image from "next/image"
 import { useOthers } from "@liveblocks/react"
-import { UserButton, useUser } from "@clerk/nextjs"
+import { UserButton } from "@/components/auth/user-button"
+import { useSupabaseUser } from "@/components/providers/supabase-user-provider"
 
 const MAX_VISIBLE = 5
 
 export function CollaboratorAvatars() {
-  const { user } = useUser()
+  const user = useSupabaseUser()
   const others = useOthers()
 
   const collaborators = others.filter((o) => o.id !== user?.id)

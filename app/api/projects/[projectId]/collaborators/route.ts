@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server"
+import { createClient } from "@/lib/supabase/server"
 import {
   getProjectShareDetails,
   isValidCollaboratorEmail,
@@ -41,9 +41,10 @@ export async function POST(
   request: Request,
   ctx: RouteContext<"/api/projects/[projectId]/collaborators">
 ) {
-  const { userId } = await auth()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!userId) {
+  if (!user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -57,7 +58,7 @@ export async function POST(
     return Response.json({ error: "Not found" }, { status: 404 })
   }
 
-  if (project.ownerId !== userId) {
+  if (project.ownerId !== user.id) {
     return Response.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -78,12 +79,7 @@ export async function POST(
   }
 
   const existingCollaborator = await prisma.projectCollaborator.findUnique({
-    where: {
-      projectId_email: {
-        projectId,
-        email,
-      },
-    },
+    where: { projectId_email: { projectId, email } },
   })
 
   if (existingCollaborator) {
@@ -94,10 +90,7 @@ export async function POST(
   }
 
   await prisma.projectCollaborator.create({
-    data: {
-      projectId,
-      email,
-    },
+    data: { projectId, email },
   })
 
   return Response.json({ ok: true }, { status: 201 })
@@ -107,9 +100,10 @@ export async function DELETE(
   request: Request,
   ctx: RouteContext<"/api/projects/[projectId]/collaborators">
 ) {
-  const { userId } = await auth()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!userId) {
+  if (!user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -123,7 +117,7 @@ export async function DELETE(
     return Response.json({ error: "Not found" }, { status: 404 })
   }
 
-  if (project.ownerId !== userId) {
+  if (project.ownerId !== user.id) {
     return Response.json({ error: "Forbidden" }, { status: 403 })
   }
 
@@ -135,12 +129,7 @@ export async function DELETE(
   }
 
   const existingCollaborator = await prisma.projectCollaborator.findUnique({
-    where: {
-      projectId_email: {
-        projectId,
-        email,
-      },
-    },
+    where: { projectId_email: { projectId, email } },
   })
 
   if (!existingCollaborator) {
@@ -148,12 +137,7 @@ export async function DELETE(
   }
 
   await prisma.projectCollaborator.delete({
-    where: {
-      projectId_email: {
-        projectId,
-        email,
-      },
-    },
+    where: { projectId_email: { projectId, email } },
   })
 
   return new Response(null, { status: 204 })
