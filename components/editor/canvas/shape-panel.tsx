@@ -84,7 +84,11 @@ interface DragState {
   y: number
 }
 
-export function ShapePanel() {
+interface ShapePanelProps {
+  onShapeSelect: (shape: NodeShape) => void
+}
+
+export function ShapePanel({ onShapeSelect }: ShapePanelProps) {
   const [drag, setDrag] = useState<DragState | null>(null)
 
   function handleDragStart(event: React.DragEvent, shape: NodeShape) {
@@ -132,18 +136,20 @@ export function ShapePanel() {
       )}
 
       <div className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center">
-        <div className="pointer-events-auto flex items-center gap-1 rounded-full border border-border-default bg-bg-surface/95 px-3 py-2 shadow-xl backdrop-blur-xl">
+        <div className="pointer-events-auto mx-3 flex max-w-[calc(100vw-1.5rem)] items-center gap-1 overflow-x-auto rounded-full border border-border-default bg-bg-surface/95 px-3 py-2 shadow-xl backdrop-blur-xl">
           {NODE_SHAPES.map((shape) => {
             const Icon = SHAPE_ICONS[shape]
             return (
               <button
                 key={shape}
                 draggable
+                onClick={() => onShapeSelect(shape)}
                 onDragStart={(e) => handleDragStart(e, shape)}
                 onDrag={(e) => handleDrag(e, shape)}
                 onDragEnd={handleDragEnd}
                 title={shape}
-                className="flex h-8 w-8 cursor-grab items-center justify-center rounded-xl text-text-muted transition-colors hover:bg-bg-elevated hover:text-text-primary active:cursor-grabbing"
+                aria-label={`Add ${shape} node`}
+                className="flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-xl text-text-muted transition-colors hover:bg-bg-elevated hover:text-text-primary active:cursor-grabbing sm:h-8 sm:w-8"
               >
                 <Icon className="h-4 w-4" />
               </button>

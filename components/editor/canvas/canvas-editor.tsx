@@ -18,7 +18,7 @@ import type { Connection } from "@xyflow/react"
 import { useLiveblocksFlow } from "@liveblocks/react-flow"
 import { useUndo, useRedo, useCanUndo, useCanRedo } from "@liveblocks/react"
 import type { CanvasNode, CanvasEdge, NodeShape } from "@/types/canvas"
-import { NODE_COLORS } from "@/types/canvas"
+import { NODE_COLORS, SHAPE_DEFAULTS } from "@/types/canvas"
 import { CanvasNodeComponent } from "@/components/editor/canvas/canvas-node"
 import { CanvasEdgeComponent } from "@/components/editor/canvas/canvas-edge"
 import { ShapePanel } from "@/components/editor/canvas/shape-panel"
@@ -197,6 +197,44 @@ export function CanvasEditor({ projectId, pendingTemplate, onTemplateImported, o
     event.dataTransfer.dropEffect = "copy"
   }, [])
 
+  const addNode = useCallback(
+    (shape: NodeShape, center: { x: number; y: number }) => {
+      const size = SHAPE_DEFAULTS[shape]
+      const id = generateNodeId(shape)
+      const newNode: CanvasNode = {
+        id,
+        type: "canvasNode",
+        position: {
+          x: center.x - size.width / 2,
+          y: center.y - size.height / 2,
+        },
+        data: {
+          label: "",
+          color: NODE_COLORS[0].fill,
+          textColor: NODE_COLORS[0].text,
+          shape,
+        },
+        width: size.width,
+        height: size.height,
+      }
+
+      onNodesChange([{ type: "add", item: newNode }])
+    },
+    [onNodesChange]
+  )
+
+  const handleShapeSelect = useCallback(
+    (shape: NodeShape) => {
+      const bounds = wrapperRef.current?.getBoundingClientRect()
+      const screenCenter = bounds
+        ? { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 }
+        : { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+
+      addNode(shape, screenToFlowPosition(screenCenter))
+    },
+    [addNode, screenToFlowPosition]
+  )
+
   const onDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault()
@@ -217,19 +255,12 @@ export function CanvasEditor({ projectId, pendingTemplate, onTemplateImported, o
         y: center.y - payload.size.height / 2,
       }
 
-      const id = generateNodeId(payload.shape)
-      const newNode: CanvasNode = {
-        id,
-        type: "canvasNode",
-        position,
-        data: { label: "", color: NODE_COLORS[0].fill, textColor: NODE_COLORS[0].text, shape: payload.shape },
-        width: payload.size.width,
-        height: payload.size.height,
-      }
-
-      onNodesChange([{ type: "add", item: newNode }])
+      addNode(payload.shape, {
+        x: position.x + payload.size.width / 2,
+        y: position.y + payload.size.height / 2,
+      })
     },
-    [screenToFlowPosition, onNodesChange]
+    [addNode, screenToFlowPosition]
   )
 
   return (
@@ -270,7 +301,7 @@ export function CanvasEditor({ projectId, pendingTemplate, onTemplateImported, o
         canUndo={canUndo}
         canRedo={canRedo}
       />
-      <ShapePanel />
+      <ShapePanel onShapeSelect={handleShapeSelect} />
       <PresenceCursors />
       <CollaboratorAvatars />
       <SaveStatusIndicator status={saveStatus} />
@@ -281,7 +312,7 @@ export function CanvasEditor({ projectId, pendingTemplate, onTemplateImported, o
 function SaveStatusIndicator({ status }: { status: SaveStatus }) {
   if (status === "idle") return null
   return (
-    <div className="pointer-events-none absolute bottom-16 left-1/2 -translate-x-1/2">
+    <div className="pointer-events-none absolute bottom-32 left-1/2 -translate-x-1/2 sm:bottom-16">
       <span
         className={
           "rounded-full px-3 py-1 text-xs font-medium " +

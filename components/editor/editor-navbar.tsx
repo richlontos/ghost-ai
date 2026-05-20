@@ -29,8 +29,8 @@ export function EditorNavbar({
   onSave,
 }: EditorNavbarProps) {
   return (
-    <header className="flex h-12 shrink-0 items-center justify-between border-b border-border-default bg-bg-surface px-3">
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-border-default bg-bg-surface px-2 sm:px-3">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         <Button variant="ghost" size="icon" onClick={onToggle}>
           {isOpen ? (
             <PanelLeftClose className="h-5 w-5" />
@@ -43,12 +43,12 @@ export function EditorNavbar({
         {projectName ? (
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-text-primary">{projectName}</p>
-            <p className="text-xs text-text-faint">Workspace</p>
+            <p className="hidden text-xs text-text-faint sm:block">Workspace</p>
           </div>
         ) : null}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-2">
         {onToggleAiSidebar ? (
           <>
             {onSave ? (
@@ -60,13 +60,15 @@ export function EditorNavbar({
                 disabled={saveStatus === "saving"}
               >
                 <Save className="h-4 w-4" />
-                {saveStatus === "saving"
-                  ? "Saving..."
-                  : saveStatus === "saved"
-                  ? "Saved"
-                  : saveStatus === "error"
-                  ? "Error"
-                  : "Save"}
+                <span className="hidden sm:inline">
+                  {saveStatus === "saving"
+                    ? "Saving..."
+                    : saveStatus === "saved"
+                    ? "Saved"
+                    : saveStatus === "error"
+                    ? "Error"
+                    : "Save"}
+                </span>
               </Button>
             ) : null}
             {onOpenTemplates ? (
@@ -77,7 +79,7 @@ export function EditorNavbar({
                 onClick={onOpenTemplates}
               >
                 <LayoutTemplate className="h-4 w-4" />
-                Templates
+                <span className="hidden sm:inline">Templates</span>
               </Button>
             ) : null}
             {onOpenShareDialog ? (
@@ -88,7 +90,7 @@ export function EditorNavbar({
                 onClick={onOpenShareDialog}
               >
                 <Share2 className="h-4 w-4" />
-                Share
+                <span className="hidden sm:inline">Share</span>
               </Button>
             ) : null}
             <Button
@@ -98,7 +100,7 @@ export function EditorNavbar({
               onClick={onToggleAiSidebar}
             >
               <Sparkles className="h-4 w-4" />
-              AI
+              <span className="hidden min-[380px]:inline">AI</span>
             </Button>
           </>
         ) : null}

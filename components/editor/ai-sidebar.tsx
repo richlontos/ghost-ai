@@ -525,14 +525,26 @@ export function AiSidebar({ isOpen, onClose, roomId, projectId }: AiSidebarProps
         </DialogContent>
       </Dialog>
 
+    {isOpen && (
+      <div
+        className="fixed inset-0 z-40 bg-bg-base/70 backdrop-blur-sm md:hidden"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+    )}
+
     <aside
+      inert={!isOpen}
+      aria-hidden={!isOpen}
       className={cn(
-        "fixed inset-y-3 right-3 top-15 z-40 hidden w-84 flex-col rounded-3xl border border-border-subtle bg-bg-surface/95 backdrop-blur-xl transition-transform duration-200 md:flex",
-        isOpen ? "translate-x-0" : "translate-x-[calc(100%+1rem)]"
+        "fixed bottom-2 left-2 right-2 top-14 z-50 flex w-auto flex-col rounded-3xl border border-border-subtle bg-bg-surface/95 backdrop-blur-xl transition-transform duration-200 md:inset-y-3 md:left-auto md:right-3 md:top-15 md:z-40 md:w-84",
+        isOpen
+          ? "translate-y-0 md:translate-x-0"
+          : "translate-y-[calc(100%+1rem)] md:translate-x-[calc(100%+1rem)] md:translate-y-0"
       )}
     >
       {/* Header */}
-      <div className="flex shrink-0 items-center gap-3 border-b border-border-default px-5 py-4">
+      <div className="flex shrink-0 items-center gap-3 border-b border-border-default px-4 py-3 sm:px-5 sm:py-4">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent-ai/15">
           <Bot className="h-4 w-4 text-accent-ai-text" />
         </div>
@@ -549,6 +561,7 @@ export function AiSidebar({ isOpen, onClose, roomId, projectId }: AiSidebarProps
         <button
           onClick={onClose}
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-subtle hover:text-text-primary"
+          aria-label="Close AI workspace"
         >
           <X className="h-4 w-4" />
         </button>
@@ -556,22 +569,22 @@ export function AiSidebar({ isOpen, onClose, roomId, projectId }: AiSidebarProps
 
       {/* Tabs */}
       <Tabs defaultValue="architect" className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <TabsList className="mx-4 mt-3 h-auto shrink-0 rounded-xl bg-bg-subtle p-1">
+        <TabsList className="mx-3 mt-3 h-auto shrink-0 rounded-xl bg-bg-subtle p-1 sm:mx-4">
           <TabsTrigger
             value="architect"
-            className="rounded-lg px-3 py-1.5 text-xs font-medium data-active:bg-accent-ai data-active:text-white data-active:shadow-none"
+            className="flex-1 rounded-lg px-2 py-1.5 text-xs font-medium data-active:bg-accent-ai data-active:text-white data-active:shadow-none sm:px-3"
           >
             AI Architect
           </TabsTrigger>
           <TabsTrigger
             value="chat"
-            className="rounded-lg px-3 py-1.5 text-xs font-medium data-active:bg-accent-ai data-active:text-white data-active:shadow-none"
+            className="flex-1 rounded-lg px-2 py-1.5 text-xs font-medium data-active:bg-accent-ai data-active:text-white data-active:shadow-none sm:px-3"
           >
             Chat
           </TabsTrigger>
           <TabsTrigger
             value="specs"
-            className="rounded-lg px-3 py-1.5 text-xs font-medium data-active:bg-accent-ai data-active:text-white data-active:shadow-none"
+            className="flex-1 rounded-lg px-2 py-1.5 text-xs font-medium data-active:bg-accent-ai data-active:text-white data-active:shadow-none sm:px-3"
           >
             Specs
           </TabsTrigger>

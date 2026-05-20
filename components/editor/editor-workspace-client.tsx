@@ -2,7 +2,7 @@
 
 import { LiveObject, LiveMap } from "@liveblocks/client"
 import { LiveblocksProvider, RoomProvider } from "@liveblocks/react"
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { EditorNavbar } from "@/components/editor/editor-navbar"
 import type { SaveStatus } from "@/hooks/use-canvas-autosave"
 import { ProjectDialogs } from "@/components/editor/project-dialogs"
@@ -27,8 +27,8 @@ export function EditorWorkspaceClient({
   sharedProjects,
   roomId,
 }: EditorWorkspaceClientProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [aiSidebarOpen, setAiSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [aiSidebarOpen, setAiSidebarOpen] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const [templatesOpen, setTemplatesOpen] = useState(false)
   const [pendingTemplate, setPendingTemplate] = useState<CanvasTemplate | null>(null)
@@ -38,6 +38,18 @@ export function EditorWorkspaceClient({
 
   const handleSaveStatusChange = useCallback((status: SaveStatus) => setSaveStatus(status), [])
   const handleSaveReady = useCallback((fn: () => void) => { saveFnRef.current = fn }, [])
+
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 768px)")
+    const syncPanels = () => {
+      setSidebarOpen(query.matches)
+      setAiSidebarOpen(query.matches)
+    }
+
+    syncPanels()
+    query.addEventListener("change", syncPanels)
+    return () => query.removeEventListener("change", syncPanels)
+  }, [])
 
   return (
     <LiveblocksProvider authEndpoint="/api/liveblocks-auth">

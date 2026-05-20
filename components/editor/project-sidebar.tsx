@@ -43,8 +43,10 @@ export function ProjectSidebar({
       )}
 
       <aside
+        inert={!isOpen}
+        aria-hidden={!isOpen}
         className={cn(
-          "fixed inset-y-3 left-3 top-[3.75rem] z-50 flex w-72 flex-col rounded-2xl border border-border-subtle bg-bg-surface/95 backdrop-blur-xl transition-transform duration-200",
+          "fixed bottom-2 left-2 right-2 top-14 z-50 flex w-auto flex-col rounded-3xl border border-border-subtle bg-bg-surface/95 backdrop-blur-xl transition-transform duration-200 md:inset-y-3 md:left-3 md:right-auto md:top-[3.75rem] md:w-72 md:rounded-2xl",
           isOpen ? "translate-x-0" : "-translate-x-[calc(100%+1rem)]"
         )}
       >
@@ -113,7 +115,7 @@ export function ProjectSidebar({
           </Tabs>
         </div>
 
-        <div className="shrink-0 p-3 border-t border-border-default">
+        <div className="shrink-0 border-t border-border-default p-3">
           <Button
             variant="default"
             size="default"
@@ -163,7 +165,7 @@ function ProjectItem({ project, active = false, onRename, onDelete }: ProjectIte
         {project.name}
       </Link>
       {onRename && onDelete && (
-        <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+        <div className="flex shrink-0 gap-0.5 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
           <Button
             variant="ghost"
             size="icon-sm"
