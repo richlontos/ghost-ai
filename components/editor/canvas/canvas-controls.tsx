@@ -22,7 +22,7 @@ export function CanvasControls({
   canRedo,
 }: CanvasControlsProps) {
   return (
-    <div className="absolute bottom-20 left-1/2 z-10 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-border-default bg-bg-surface/95 px-2 py-1.5 shadow-xl backdrop-blur-xl sm:bottom-4 sm:left-4 sm:translate-x-0">
+    <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+5rem)] left-1/2 z-40 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-border-default bg-bg-surface/95 px-2 py-1.5 shadow-xl backdrop-blur-xl sm:bottom-4 sm:left-4 sm:translate-x-0">
       <ControlButton onClick={onZoomOut} title="Zoom out">
         <Minus className="h-3.5 w-3.5" />
       </ControlButton>

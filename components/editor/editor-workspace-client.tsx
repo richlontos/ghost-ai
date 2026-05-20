@@ -60,7 +60,7 @@ export function EditorWorkspaceClient({
           flow: new LiveObject({ nodes: new LiveMap(), edges: new LiveMap() }),
         })}
       >
-        <div className="flex h-screen flex-col bg-bg-base">
+        <div className="flex h-dvh flex-col bg-bg-base">
           <EditorNavbar
             isOpen={sidebarOpen}
             onToggle={() => setSidebarOpen((prev) => !prev)}

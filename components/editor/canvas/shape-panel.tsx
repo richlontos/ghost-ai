@@ -135,7 +135,7 @@ export function ShapePanel({ onShapeSelect }: ShapePanelProps) {
         </div>
       )}
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center">
+      <div className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-40 flex justify-center sm:bottom-4">
         <div className="pointer-events-auto mx-3 flex max-w-[calc(100vw-1.5rem)] items-center gap-1 overflow-x-auto rounded-full border border-border-default bg-bg-surface/95 px-3 py-2 shadow-xl backdrop-blur-xl">
           {NODE_SHAPES.map((shape) => {
             const Icon = SHAPE_ICONS[shape]
