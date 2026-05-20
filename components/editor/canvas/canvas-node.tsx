@@ -5,6 +5,7 @@ import { Handle, Position, NodeResizer, NodeToolbar } from "@xyflow/react"
 import type { NodeProps } from "@xyflow/react"
 import { useMutation } from "@liveblocks/react"
 import { LiveObject } from "@liveblocks/client"
+import { Trash2 } from "lucide-react"
 import type { CanvasNode, NodeShape } from "@/types/canvas"
 import { NODE_COLORS } from "@/types/canvas"
 
@@ -108,6 +109,11 @@ type LiveNodeData = LiveObject<{
   data: LiveObject<{ label: string; color?: string; textColor?: string; shape?: NodeShape }>
 }>
 
+type LiveCanvasEdge = LiveObject<{
+  source: string
+  target: string
+}>
+
 export function CanvasNodeComponent({ id, data, selected }: NodeProps<CanvasNode>) {
   const fill = data.color ?? DEFAULT_FILL
   const textColor = data.textColor ?? DEFAULT_TEXT
@@ -130,6 +136,23 @@ export function CanvasNodeComponent({ id, data, selected }: NodeProps<CanvasNode
     const liveData = (node as unknown as LiveNodeData).get("data")
     liveData.set("color", colorFill)
     liveData.set("textColor", colorText)
+  }, [id])
+
+  const deleteNode = useMutation(({ storage }) => {
+    const flow = storage.get("flow")
+    const nodes = flow.get("nodes")
+    const edges = flow.get("edges")
+
+    nodes.delete(id)
+
+    const connectedEdgeIds: string[] = []
+    edges.forEach((edge, edgeId) => {
+      const liveEdge = edge as unknown as LiveCanvasEdge
+      if (liveEdge.get("source") === id || liveEdge.get("target") === id) {
+        connectedEdgeIds.push(edgeId)
+      }
+    })
+    connectedEdgeIds.forEach((edgeId) => edges.delete(edgeId))
   }, [id])
 
   const startEditing = useCallback((e: React.MouseEvent) => {
@@ -199,6 +222,21 @@ export function CanvasNodeComponent({ id, data, selected }: NodeProps<CanvasNode
               onSelect={updateNodeColor}
             />
           ))}
+          <span className="mx-0.5 h-5 w-px bg-border-default" aria-hidden="true" />
+          <button
+            type="button"
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-state-error transition-colors hover:bg-state-error/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-state-error/40"
+            aria-label="Delete node"
+            title="Delete node"
+            onClick={(e) => {
+              e.stopPropagation()
+              deleteNode()
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
         </div>
       </NodeToolbar>
 

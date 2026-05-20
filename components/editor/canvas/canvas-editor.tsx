@@ -112,7 +112,7 @@ export function CanvasEditor({ projectId, pendingTemplate, onTemplateImported, o
         if (canvas.edges?.length) {
           onEdgesChange(canvas.edges.map((ed) => ({ type: "add" as const, item: ed })))
         }
-        setTimeout(() => fitView({ duration: 300 }), 120)
+        setTimeout(() => fitView({ duration: 300, maxZoom: 1 }), 120)
       })
       .catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -283,6 +283,7 @@ export function CanvasEditor({ projectId, pendingTemplate, onTemplateImported, o
         connectionMode={ConnectionMode.Loose}
         connectionLineStyle={CONNECTION_LINE_STYLE}
         connectionLineType={ConnectionLineType.SmoothStep}
+        zoomOnDoubleClick={false}
         className="bg-bg-base"
       >
         <Background
